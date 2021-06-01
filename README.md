@@ -29,7 +29,7 @@ This role consists of 2 files masterEC2.py and slaveEC2.py. Copy these 2 files (
 
 Example Playbook
 ----------------
-
+<pre><code>
   - name: "Provision Kubernetes cluster on AWS"
     hosts: localhost
     vars_files:
@@ -43,6 +43,7 @@ Example Playbook
       private: no
     roles:
     - provision-kubernetes-cluster-over-AWS
+    </code></pre>
 
 Author Information
 ------------------
