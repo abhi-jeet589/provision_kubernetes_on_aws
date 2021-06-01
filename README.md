@@ -42,7 +42,7 @@ Example Playbook
       prompt: "Enter the number of Slaves you want"
       private: no
     roles:
-    - provision-kubernetes-cluster-over-AWS
+    - provision_kubernetes_on_aws
     </code></pre>
 
 Author Information
