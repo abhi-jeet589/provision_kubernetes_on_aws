@@ -1,38 +1,50 @@
-Role Name
+provision_kubernetes_on_aws
 =========
 
-A brief description of the role goes here.
+Provision kubernetes cluster on AWS public cloud using AWS EC2 service. Furthermore retrieve the public IPs of the instances launched creating a dynamic inventory to further configure the instances with kubernetes.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+The pre-requisites for this role include installing Boto3 library. However it is not compulsary as the role will itself download the library if not present.
 
 Role Variables
 --------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+To use thie role you need to use 2 variables:
+1. numberOfMasters
+2. numberOfSlaves
+Also you need to creat an ansible vault variable file which will consist of variables:
+1. access_key : attach the AWS Access Key here
+2. secret_key : attach the AWS Secret Access key here
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+This role consists of 2 files masterEC2.py and slaveEC2.py. Copy these 2 files (located at files directory) to the playbook directory. These 2 files are responsible for dynamic inventory. To use these 2 files you need to export environmental variables in your shell. The environmental variables include:
+1. AWS_ACCESS_KEY_ID : your AWS Access key
+2. AWS_SECRET_ACCESS_KEY : your AWS Secret Access key
+3. AWS_DEFAULT_REGION : default region to work with on AWS
+4. NUMBER_OF_MASTERS : number of master nodes you want ( must be the same as numberOfMasters role variable)
+5. NUMBER_OF_SLAVES : number of slave nodes you want ( must be the same as numberOfSlaves role variable)
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
-License
--------
-
-BSD
+  - name: "Provision Kubernetes cluster on AWS"
+    hosts: localhost
+    vars_files:
+    - secret.yml
+    vars_prompt:
+    - name: "numberOfMaster"
+      prompt: "Enter the number of Master you want"
+      private: no
+    - name: "numberOfSlaves"
+      prompt: "Enter the number of Slaves you want"
+      private: no
+    roles:
+    - provision-kubernetes-cluster-over-AWS
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+For further information you can contact me @ abhijeetkarmakar23@gmail.com
