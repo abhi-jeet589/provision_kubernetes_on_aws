@@ -1,0 +1,70 @@
+---
+# tasks file for provision-kubernetes-cluster-over-AWS
+  - name: "Pre-requisite for provisioning check"
+    pip:
+       name: "{{  item  }}"
+       state: present
+    loop:
+       - "boto"
+       - "boto3"
+       - "botocore"
+
+  - name: "Provision Kubernetes Master on AWS"
+    ec2:
+      assign_public_ip: yes
+      aws_access_key: "{{  access_key  }}"
+      aws_secret_key: "{{  secret_key  }}"
+      count: "{{  numberOfMaster  }}"
+      image: "ami-04b1ddd35fd71475a"
+      instance_tags:
+          Name: "Ansible-Kube-Master"
+      instance_type: "t2.micro"
+      region: "ap-south-1"
+      key_name: "kubeKey"
+      group_id: "sg-0f60d1817099ad5ee"
+      vpc_subnet_id: "subnet-66e1db0e"
+      wait: yes
+      state: present
+
+  - name: "Provision Kubernetes Slave on AWS"
+    ec2:
+      assign_public_ip: yes
+      aws_access_key: "{{  access_key  }}"
+      aws_secret_key: "{{  secret_key  }}"
+      count: "{{  numberOfSlaves  }}"
+      image: "ami-04b1ddd35fd71475a"
+      instance_tags:
+          Name: "Ansible-Kube-Slave"
+      instance_type: "t2.micro"
+      region: "ap-south-1"
+      key_name: "kubeKey"
+      group_id: "sg-0f60d1817099ad5ee"
+      vpc_subnet_id: "subnet-66e1db0e"
+      wait: yes
+      state: present
+
+  - name: "Fetching Master IP"
+    shell:
+      cmd: "provision-kubernetes-cluster-over-AWS/files/./masterEC2.py"
+    register: masterIP
+
+  - name: "Configuring dynamic inventory with Master"
+    lineinfile:
+      line: "[master]\n{{ masterIP.stdout  }}"
+      insertafter: EOF
+      path: "dynamicInventory.txt"
+      state: present
+      create: yes
+
+  - name: "Fetching Slave IP"
+    shell:
+      cmd: "provision-kubernetes-cluster-over-AWS/files/./slaveEC2.py"
+    register: slaveIP
+
+  - name: "Configuring dynamic inventory with Slave(s)"
+    lineinfile:
+      line: "[slaves]\n{{ slaveIP.stdout  }}"
+      insertafter: EOF
+      path: "dynamicInventory.txt"
+      state: present
+

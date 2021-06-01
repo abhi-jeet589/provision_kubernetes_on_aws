@@ -1,0 +1,10 @@
+---
+# vars file for provision-kubernetes-cluster-over-AWS
+  vars_prompt:
+  - name: "numberOfMaster"
+    prompt: "Enter the number of Master you want"
+    private: no
+  - name: "numberOfSlaves"
+    prompt: "Enter the number of Slaves you want"
+    private: no
+
